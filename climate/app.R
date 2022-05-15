@@ -5,6 +5,9 @@ library(shinythemes)
 library(dplyr)
 library(plotly)
 library(writexl)
+library(rsconnect)
+
+#rsconnect::deployApp('D:/shiny/climate')
 
 ui <- fluidPage(theme = shinytheme("readable"),
     navbarPage(
@@ -22,16 +25,22 @@ ui <- fluidPage(theme = shinytheme("readable"),
                              #?????????? ???????????? ??????????????
                              choices = list("Nikolaevskoe" = "26167", "Novgorod" = "26179", "St.petersburg (Voejkovo)" = "26063"), 
                              selected = "Novgorod"),
-                 dateInput("date1", "Date:", value = "2022-02-21"),
-                 dateInput("date2", "Date:", value = "2022-03-21"),
+                 dateInput("date1", "Date start:", value = "2022-02-21"),
+                 dateInput("date2", "Date end:", value = "2022-03-21"),
                  
-                 actionButton("submitbutton", "Submit", class = "btn btn-primary")
+                 actionButton("submitbutton", "Submit"),
+                 br(),
+                 
+                 textInput("caption", "File", value = "Climate_app_data_"),
+                 
+                 downloadButton("download", "Download")
                ),
                
                mainPanel(
                  tags$label(h3('Output')), 
-                 plotlyOutput("distPlot"),
-                 tableOutput('datasetInput')
+                 plotlyOutput("printplot"),
+                 tags$hr(),
+                 tableOutput("printtable")
                  
                )
                
@@ -42,7 +51,7 @@ ui <- fluidPage(theme = shinytheme("readable"),
                
                # Input values
                sidebarPanel(
-                 HTML("<h3>Input parameters</h3>"),
+                 HTML("<h3>Input parameters</h3>")
                  
                  #selectInput("station", label = "Station:", 
                              #?????????? ???????????? ??????????????
@@ -67,17 +76,21 @@ ui <- fluidPage(theme = shinytheme("readable"),
 
 # Define server logic required to draw a histogram ----
 server <- function(input, output) {
- 
+  
   # Plot1
-  output$distPlot <- renderPlotly({
+  output$printplot <- renderPlotly({
     
-    dfff <- data.frame(
+    input$submitbutton
+    
+    daf <- data.frame(
       Name = c("station",
                "date1",
-               "date2"),
+               "date2",
+               "caption"),
       Value = as.character(c(input$station,
                              input$date1,
-                             input$date2)),
+                             input$date2,
+                             input$caption)),
       stringsAsFactors = FALSE)
     
     df = meteo_ogimet(interval = "daily", date = c(input$date1, input$date2), station = input$station)
@@ -85,33 +98,34 @@ server <- function(input, output) {
     data1 <- data.frame(df[3], df[2])
     fig1 <- plot_ly(data1, x = ~ Date, y = ~ TemperatureCAvg) %>% 
       add_lines()
-    fig1
+    fig1 
     
   })
   
   
   # Data Table
-  output$datasetInput <- renderTable({  
+  output$printtable <- renderTable({  
     
-    dfff <- data.frame(
-      Name = c("station",
-               "date1",
-               "date2"),
-      Value = as.character(c(input$station,
-                             input$date1,
-                             input$date2)),
-      stringsAsFactors = FALSE)
+    input$submitbutton
     
     df = meteo_ogimet(interval = "daily", date = c(input$date1, input$date2), station = input$station)
     
     df1 = df[2]
     
-    data.frame(format(df1, format = "%d %m %Y"), df[3:5])
+    data <- data.frame(format(df1, format = "%d %m %Y"), df[3:5])
     
-    #write_xlsx(df[2:5], 'D:\\data.xlsx')
+    data.frame(format(df1, format = "%d %m %Y"), df[3:5])
     
   })
   
+  output$download <- downloadHandler(
+    
+    filename = function() {
+      paste(input$caption, Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {write.csv(meteo_ogimet(interval = "daily", date = c(input$date1, input$date2), station = input$station), file)}
+    
+  )
 }
 
 # Create Shiny app ----
