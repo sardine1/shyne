@@ -11,31 +11,51 @@ library(shinydashboard)
 #rsconnect::deployApp('D:/shiny/climate')
 
 ui <- fluidPage(theme = shinytheme("readable"),
+      tags$head(HTML("<title>CLIMATE APP</title>")),
       dashboardPage(skin = "black",
-        dashboardHeader(title = tags$a(tags$img(src = "https://github.com/sardine1/shiny/blob/main/climate/%D0%9B%D0%9E%D0%93%D0%9E_1-1small.png?raw=true", 
-                                                align = "centre", width = 110, height = 80)), 
-              tags$li(class = "dropdown",
-                      tags$style(".main-header {max-height: 80px}"),
-                      tags$style(".main-header .logo {height: 80px;}"),
-                      tags$style(".sidebar-toggle {height: 80px; padding-top: 27px !important;}"),
-                      tags$style(".navbar {min-height:80px !important}"),
-                      
-              ) ),
-        dashboardSidebar(sidebarMenu(
+        dashboardHeader(title = tags$a(tags$img(src = "https://raw.githubusercontent.com/sardine1/shiny/7c6b85fb1ace0fde505e013ef8d8b5daa664bd0e/climate/Cleo.svg", 
+                                                align = "centre", width = "100%", height = "90%"))),
+        dashboardSidebar(
+          disable = FALSE, 
+          width = NULL,
+          collapsed = TRUE,
+          sidebarMenu(
           menuItem("Меню"),
-          menuItem("Информация", tabName = "introduction", icon = icon("th")),
-          menuItem("Температура", tabName = "temperature", icon = icon("th")),
-          menuItem("Другое", tabName = "widgets", icon = icon("th"))
-        )),
+          menuItem("Информация", tabName = "introduction", icon = icon("book")),
+          menuItem("Температура", tabName = "temperature", icon = icon("thermometer"))
+        ),
+        tags$head(tags$style(HTML('.logo {
+                              background-color: #FFFFFF !important;
+                              }
+                              .navbar {
+                              background-color: #FFFFFF !important;
+                              }')))),
         dashboardBody(
-          
           tabItems(
             # Первая вкладка
             tabItem(tabName = "introduction",
                     fluidRow(
                       tabBox(
                         #title = "Первый блок",
-                        id = "tabset1", height = "300px",
+                        id = "tabset1", height = "100%",
+                        tabPanel("Инструкция", h5("Добро пожаловать!"), br(),
+                                 "Здесь Вы можете ознакомиться с данными с Российских метеорологических станций. Данные доступны с 2000 года.", br(),
+                                 br(),
+                                 "Лаборатория экономики климатических изменений и экологического развития"),
+                        tabPanel("Планы", h5("Планы по развитию"), br(), 
+                                 "Обновление данного ресурса будет производиться постепенно. На данный момент ресурс адаптирован для просмотра с планшета и компьютера.", br(),
+                                 "Каждую неделю будет выпускаться новое обновление.", br(), br(),
+                                 icon("calendar"),
+                                 "Ближайшее обновление запланировано на 24.05", br(),
+                                 "Будет доступна выгрузка следующих данных:", br(),
+                                 "- почасовых;", br(),
+                                 "- среднемесячных.", br(), br(),
+                                 "Если есть вопросы и предложения – пишите на почту dllab@sfu-kras.ru"                                 )
+                      ),
+                      tabBox(
+                        #title = "Второй блок",
+                        side = "right", height = "100%",
+                        selected = "Общее",
                         tabPanel("Общее", h5("Информация по вкладке Температура"), br(),
                                  "1. Необходимо выбрать станцию (с полным списком станций можно ознакомиться в Станции);", br(),
                                  "2. Необходимо задать начальную и конечную даты;", br(),
@@ -103,14 +123,6 @@ ui <- fluidPage(theme = shinytheme("readable"),
                           Buj, Rostov, Konosha, Cerepovec,
                           Ivanovo, Uglic, Belozersk, Njandoma,
                           Kargopol, Vladimir")
-                      ),
-                      tabBox(
-                        #title = "Второй блок",
-                        side = "right", height = "300px",
-                        selected = "Tab3",
-                        tabPanel("Tab1", "Tab content 1"),
-                        tabPanel("Tab2", "Tab content 2"),
-                        tabPanel("Tab3", "Note that when side=right, the tab order is reversed.")
                       )
                     ),
                     
@@ -118,8 +130,7 @@ ui <- fluidPage(theme = shinytheme("readable"),
             
             # Вторая вкладка
             tabItem(tabName = "temperature",
-                    box(status = "primary",
-                    width = "100%",
+                    box(width = "100%",
                     HTML("<h3>Изменяемые параметры</h3>"),
                     
                     selectInput("station", label = "Станция:", 
@@ -187,12 +198,12 @@ ui <- fluidPage(theme = shinytheme("readable"),
                     tableOutput("printtable")
                       
                     ))
-            ),
+            )#,
             
             #Третья вкладка
-            tabItem(tabName = "widgets",
-                    h2("tab content")
-            )
+            #tabItem(tabName = "widgets",
+            #        h2("tab content")
+            #)
           )
         )
       )           
@@ -236,9 +247,9 @@ server <- function(input, output) {
     
     df1 = df[2]
     
-    data <- data.frame(format(df1, format = "%d %m %Y"), df[3:5])
+    data <- data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
     
-    data.frame(format(df1, format = "%d %m %Y"), df[3:5])
+    data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
     
   })
   

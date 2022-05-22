@@ -5,9 +5,10 @@ account: tpleshkova
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6199192
-bundleId: 5854759
+bundleId: 5931738
 url: https://tpleshkova.shinyapps.io/climate/
-when: 1651323034.71359
-lastSyncTime: 1651323034.71359
+when: 1653207763.67817
+lastSyncTime: 1653207763.67817
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: ????_1-1.png|????_1-1small.png|????_1.pdf|Cleo.svg
