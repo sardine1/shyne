@@ -9,6 +9,7 @@ library(rsconnect)
 library(shinydashboard)
 library(leaflet)
 library(tidyverse)
+library(shinyjs)
 #library(ggmap)
 
 #rsconnect::deployApp('D:/shiny/climate')
@@ -126,6 +127,15 @@ ui <- fluidPage(theme = shinytheme("readable"),
             tabItem(tabName = "temperature_hourly",
                     box(width = "100%",
                     HTML("<h3>Изменяемые параметры</h3>"),
+                    
+                    selectInput("had_pet", "Have you ever had a pet?", c("", "Yes", "No")),
+                    hidden(tags$div(
+                      id = "first_pet_grp",
+                      selectInput("first_pet", "What was your first pet?",
+                                  c("", "dog", "cat", "ferret", "other")),
+                      textInput("first_pet_other", NULL,
+                                placeholder = "Specify the other pet")
+                    )),
                     
                     selectInput("station", label = "Станция:", 
                                 #станции
@@ -450,6 +460,14 @@ ui <- fluidPage(theme = shinytheme("readable"),
 
 # Define server logic required to draw a histogram ----
 server <- function(input, output) {
+  
+  observeEvent(input$had_pet, {
+    if (input$had_pet == "Yes") {
+      show("first_pet_grp")
+    } else {
+      hide("first_pet_grp")
+    }
+  })
   
   # Plot1
   output$printplot_daily <- renderPlotly({
