@@ -8,6 +8,8 @@ library(writexl)
 library(rsconnect)
 library(shinydashboard)
 library(leaflet)
+library(ggmap)
+library(shinycssloaders)
 
 #rsconnect::deployApp('D:/shiny/climate')
 
@@ -185,7 +187,7 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                               mainPanel(
                                                 tags$label(h3('Данные')),
                                                 tags$hr(),
-                                                tableOutput("printtable")
+                                                tableOutput("printtable") %>% withSpinner(color="#6fc50d")
                                                 
                                               ))
                                   ),
@@ -264,9 +266,9 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                               br(),
                                               mainPanel(
                                                 tags$label(h3('График средней температуры по заданному интервалу времени')),
-                                                plotlyOutput("printplot_daily"),
+                                                plotlyOutput("printplot_daily") %>% withSpinner(color="#6fc50d"),
                                                 tags$hr(),
-                                                tableOutput("printtable_daily")
+                                                tableOutput("printtable_daily") %>% withSpinner(color="#6fc50d")
                                                 
                                               ))
                                   ),
@@ -331,6 +333,7 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                               #            choices = list("January" = "01", "February" = "02", "March" = "03", "April" = "04", "May" = "05", "June" = "06", "July" = "07", "August" = "08", "September" = "09", "October" = "10", "November" = "11", "December" = "12")),
                                               #selectInput("month_to", label = "По (включая)",
                                               #            choices = list("February" = "02", "March" = "03", "April" = "04", "May" = "05", "June" = "06", "July" = "07", "August" = "08", "September" = "09", "October" = "10", "November" = "11", "December" = "12"))
+                                              actionButton("submitbutton", "Показать"),
                                               br(),
                                               
                                               HTML("<h3>Скачать файл с данными</h3>"),
@@ -340,9 +343,9 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                               br(),
                                               mainPanel(
                                                 tags$label(h3('График средней температуры по заданному интервалу времени')),
-                                                plotlyOutput("printplot_monthly"),
+                                                plotlyOutput("printplot_monthly") %>% withSpinner(color="#6fc50d"),
                                                 tags$hr(),
-                                                tableOutput("printtable_monthly")
+                                                tableOutput("printtable_monthly") %>% withSpinner(color="#6fc50d")
                                               ))
                                   ),
                                   
@@ -353,13 +356,13 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                               h3("Долгота"),
                                               textInput("from", label = h5("От"), value = "30"),
                                               textInput("to", label = h5("До"), value = "85"),
-                                              
+                                              actionButton("submitbutton", "Показать"),
                                               br(),
                                               mainPanel(
                                                 tags$label(h3('Данные')),
-                                                tableOutput("printtable_station")
-                                                #tags$hr(),
-                                                #tableOutput("printtable")
+                                                plotlyOutput("printplot_map") %>% withSpinner(color="#6fc50d"),
+                                                tags$hr(),
+                                                tableOutput("printtable_station") %>% withSpinner(color="#6fc50d")
                                               ))
                                   )
                                   
@@ -370,6 +373,10 @@ ui <- fluidPage(theme = shinytheme("readable"),
 
 # Define server logic required to draw a histogram ----
 server <- function(input, output) {
+
+  data <- eventReactive(input$submitbutton,{
+    rnorm(1:100000)
+  })
   
   # Plot Daily
   output$printplot_daily <- renderPlotly({
@@ -410,26 +417,6 @@ server <- function(input, output) {
       fig1
     }
     fig1
-    
-  })
-  
-  
-  # Data Table Station
-  output$printtable_station <- renderTable({
-    input$submitbutton
-    
-    daf_station <- data.frame(
-      Name = c("from",
-               "to"),
-      Value = as.character(c(input$from,
-                             input$to)),
-      stringsAsFactors = FALSE)
-    
-    
-    nearest_stations_ogimet(country = "Russia",
-                            date = Sys.Date(),
-                            point = c(input$from, input$to),
-                            no_of_stations = 300)
     
   })
   
@@ -565,6 +552,37 @@ server <- function(input, output) {
         summarise(meantemp = mean(TemperatureCAvg))
       , file)}
   )
+  
+  # Data Table Station
+  output$printtable_station <- renderTable({
+    input$submitbutton
+    
+    daf_station <- data.frame(
+      Name = c("from",
+               "to"),
+      Value = as.character(c(input$from,
+                             input$to)),
+      stringsAsFactors = FALSE)
+    
+    
+    nearest_stations_ogimet(country = "Russia",
+                            date = Sys.Date(),
+                            point = c(input$from, input$to),
+                            no_of_stations = 300)
+    
+  })
+  
+  # Plot station
+  output$printplot_map <- renderPlotly({
+    
+    my_df = nearest_stations_ogimet(country = "Russia",
+                                    date = Sys.Date(),
+                                    point = c(input$from, input$to),
+                                    no_of_stations = 300)
+    
+    qmplot(lon, lat, data = my_df, colour = I('red'), size = I(2), darken = .3)
+    
+  })
   
 }
 
