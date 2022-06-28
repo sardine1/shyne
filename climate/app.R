@@ -10,6 +10,9 @@ library(shinydashboard)
 library(leaflet)
 library(ggmap)
 library(shinycssloaders)
+library(rio)
+
+y <- import("https://raw.githubusercontent.com/sardine1/shiny/main/climate/stations.csv")
 
 #rsconnect::deployApp('D:/shiny/climate')
 
@@ -125,7 +128,10 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                   tabItem(tabName = "temperature_hourly",
                                           box(width = "100%",
                                               HTML("<h3>Изменяемые параметры</h3>"),
-                                              
+                                              sidebarPanel(width = "100%",
+                                                           selectInput("region_seek_hourly", "Регионы", choices = unique(y$region)),
+                                                           selectInput("station_seek_hourly", "Станции", choices = NULL),
+                                              ),
                                               selectInput("station_hourly", label = "Станция:", 
                                                           #станции
                                                           choices = list("Belogorka" = "26069", "Nikolaevskoe" = "26167", "Volosovo" = "26067", "Lomonosov" = "26060",
@@ -173,8 +179,8 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                                                          "Buj" = "27242", "Rostov" = "27329", "Konosha" = "22951", "Cerepovec" = "27113", "Ivanovo" = "27347", "Uglic" = "27321",
                                                                          "Belozersk" = "22939", "Njandoma" = "22854", "Kargopol" = "22845", "Vladimir" = "27532"), 
                                                           selected = "Novgorod"),
-                                              h6("Формат даты : yyyy-mm-dd."), 
-                                              h6("При вводе даты с клавиатуры разделитель может быть любой, по окончании необходимо нажать enter."),
+                                              #h6("Формат даты : yyyy-mm-dd."), 
+                                              h6("При вводе даты с клавиатуры разделитель может быть любой, например, пробел, по окончании необходимо нажать enter."),
                                               dateInput("date_hourly_start", "Начальная дата:", min = "2013-01-01", value = "2022-01-01", startview = 'year', format = "yyyy-mm-dd"),
                                               dateInput("date_hourly_end", "Конечная дата:", min = "2013-01-01", value = "2022-03-31", startview = 'year', format = "yyyy-mm-dd"),
                                               
@@ -198,7 +204,10 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                   tabItem(tabName = "temperature_daily",
                                           box(width = "100%",
                                               HTML("<h3>Изменяемые параметры</h3>"),
-                                              
+                                              sidebarPanel(width = "100%",
+                                                           selectInput("region_seek_daily", "Регионы", choices = unique(y$region)),
+                                                           selectInput("station_seek_daily", "Станции", choices = NULL),
+                                              ),
                                               selectInput("station_daily", label = "Станция:", 
                                                           #станции
                                                           choices = list("Belogorka" = "26069", "Nikolaevskoe" = "26167", "Volosovo" = "26067", "Lomonosov" = "26060",
@@ -246,8 +255,8 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                                                          "Buj" = "27242", "Rostov" = "27329", "Konosha" = "22951", "Cerepovec" = "27113", "Ivanovo" = "27347", "Uglic" = "27321",
                                                                          "Belozersk" = "22939", "Njandoma" = "22854", "Kargopol" = "22845", "Vladimir" = "27532"), 
                                                           selected = "Novgorod"),
-                                              h6("Формат даты : yyyy-mm-dd."), 
-                                              h6("При вводе даты с клавиатуры разделитель может быть любой, по окончании необходимо нажать enter."),
+                                              #h6("Формат даты : yyyy-mm-dd."), 
+                                              h6("При вводе даты с клавиатуры разделитель может быть любой, например, пробел, по окончании необходимо нажать enter."),
                                               dateInput("date_daily_start", "Начальная дата:", min = "2013-01-01", value = "2022-02-21", format = "yyyy-mm-dd"),
                                               dateInput("date_daily_end", "Конечная дата:", min = "2013-01-01", value = "2022-03-21", format = "yyyy-mm-dd"),
                                               
@@ -378,8 +387,34 @@ ui <- fluidPage(theme = shinytheme("readable"),
 )
 
 # Define server logic required to draw a histogram ----
-server <- function(input, output) {
-
+server <- function(input, output, session) {
+  
+  f_region_seek <- reactive({
+    req(input$region_seek_hourly)
+    filter(y, region == input$region_seek_hourly)
+  })
+  f_station_seek <- reactive({
+    req(input$station_seek_hourly)
+    filter(f_region_seek(), station == input$station_seek_hourly)
+  })
+  
+  observeEvent(f_region_seek(), {
+    updateSelectInput(session, "station_seek_hourly", choices = unique(f_region_seek()$station), selected = character())
+  })
+  
+  f_region_seek_daily <- reactive({
+    req(input$region_seek_daily)
+    filter(y, region == input$region_seek_daily)
+  })
+  f_station_seek_daily <- reactive({
+    req(input$station_seek_daily)
+    filter(f_region_seek_daily(), station == input$station_seek_daily)
+  })
+  
+  observeEvent(f_region_seek_daily(), {
+    updateSelectInput(session, "station_seek_daily", choices = unique(f_region_seek_daily()$station), selected = character())
+  })
+  
   data <- eventReactive(input$submitbutton,{
     rnorm(1:100000)
   })
@@ -390,20 +425,21 @@ server <- function(input, output) {
     input$submitbutton
     
     daf_daily <- data.frame(
-      Name = c("station_daily",
+      Name = c("station_seek_daily",
                "date_daily_start",
                "date_daily_end",
                "param_daily",
                "caption_daily"),
-      Value = as.character(c(input$station_daily,
+      Value = as.character(c(input$station_seek_daily,
                              input$date_daily_start,
                              input$date_daily_end,
                              input$param_daily,
                              input$caption_daily)),
       stringsAsFactors = FALSE)
     
+    num_station_daily <- subset(y, station == input$station_seek_daily)
     
-    df = meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = input$station_daily)
+    df = meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = as.numeric(num_station_daily[3]))
     data1 = data.frame(df[names(df) == input$param_daily], df[2])
     if (input$param_daily == "TemperatureCAvg") {
       fig1 = plot_ly(data1, x = ~ Date, y = ~ TemperatureCAvg) %>% 
@@ -432,17 +468,19 @@ server <- function(input, output) {
     input$submitbutton
     
     daf_hourly <- data.frame(
-      Name = c("station_hourly",
+      Name = c("station_seek_hourly",
                "date_hourly_start",
                "date_hourly_end",
                "caption_hourly"),
-      Value = as.character(c(input$station_hourly,
+      Value = as.character(c(input$station_seek_hourly,
                              input$date_hourly_start,
                              input$date_hourly_end,
                              input$caption_hourly)),
       stringsAsFactors = FALSE)
     
-    df = meteo_ogimet(interval = "hourly", date = c(input$date_hourly_start, input$date_hourly_end), station = input$station_hourly)
+    num_station_hourly <- subset(y, station == input$station_seek_hourly)
+    
+    df = meteo_ogimet(interval = "hourly", date = c(input$date_hourly_start, input$date_hourly_end), station = as.numeric(num_station_hourly[3]))
     
     df1 = df[2]
     
@@ -458,7 +496,7 @@ server <- function(input, output) {
     filename = function() {
       paste(input$caption_hourly, Sys.Date(), ".csv", sep="")
     },
-    content = function(file) {write.csv(meteo_ogimet(interval = "hourly", date = c(input$date_hourly_start, input$date_hourly_end), station = input$station_hourly), file)}
+    content = function(file) {write.csv(meteo_ogimet(interval = "hourly", date = c(input$date_hourly_start, input$date_hourly_end), station = as.numeric(subset(y, station == input$station_seek_hourly)[3])), file)}
     
   )
   
@@ -467,7 +505,9 @@ server <- function(input, output) {
     
     input$submitbutton
     
-    df = meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = input$station_daily)
+    num_station_daily <- subset(y, station == input$station_seek_daily)
+    
+    df = meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = as.numeric(num_station_daily[3]))
     
     df1 = df[2]
     
@@ -483,7 +523,7 @@ server <- function(input, output) {
     filename = function() {
       paste(input$caption, Sys.Date(), ".csv", sep="")
     },
-    content = function(file) {write.csv(meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = input$station_daily), file)}
+    content = function(file) {write.csv(meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = as.numeric(subset(y, station == input$station_seek_daily)[3])), file)}
     
   )
   
