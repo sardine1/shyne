@@ -324,11 +324,11 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                               h3("Долгота"),
                                               textInput("from", label = h5("От"), value = "30"),
                                               textInput("to", label = h5("До"), value = "85"),
-                                              actionButton("submitbutton", "Показать"),
+                                              actionButton("submitbutton_station", "Показать"),
                                               br(),
                                               mainPanel(
                                                 tags$label(h3('Данные')),
-                                                plotlyOutput("printplot_map") %>% withSpinner(color="#6fc50d"),
+                                                leafletOutput("printplot_map") %>% withSpinner(color="#6fc50d"),
                                                 tags$hr(),
                                                 tableOutput("printtable_station") %>% withSpinner(color="#6fc50d")
                                               ))
@@ -553,9 +553,7 @@ server <- function(input, output, session) {
   )
   
   # Data Table Station
-  output$printtable_station <- renderTable({
-    input$submitbutton
-    
+  data_station_print <- eventReactive(input$submitbutton_station,{
     daf_station <- data.frame(
       Name = c("from",
                "to"),
@@ -567,21 +565,38 @@ server <- function(input, output, session) {
     nearest_stations_ogimet(country = "Russia",
                             date = Sys.Date(),
                             point = c(input$from, input$to),
-                            no_of_stations = 300)
-    
+                            no_of_stations = 600)
   })
   
-  # Plot station
-  output$printplot_map <- renderPlotly({
-    
-    my_df = nearest_stations_ogimet(country = "Russia",
-                                    date = Sys.Date(),
-                                    point = c(input$from, input$to),
-                                    no_of_stations = 300)
-    
-    qmplot(lon, lat, data = my_df, colour = I('red'), size = I(2), darken = .3)
-    
+  # Data Table Station
+  output$printtable_station <- renderTable({
+    data_station_print()
   })
+  
+  #Stations on a map
+  data_station_print_map <- eventReactive(input$submitbutton_station,{
+    daf_station <- data.frame(
+      Name = c("from",
+               "to"),
+      Value = as.character(c(input$from,
+                             input$to)),
+      stringsAsFactors = FALSE)
+    
+    
+    k <- leaflet::leaflet(nearest_stations_ogimet(country = "Russia",
+                                                  date = Sys.Date(),
+                                                  point = c(input$from, input$to),
+                                                  no_of_stations = 600)) %>% 
+      addTiles() %>%
+      addMarkers(~lon, ~lat, popup = ~as.character(station_names), label = ~as.character(station_names))
+    k 
+  })
+  
+  #Stations on a map
+  output$printplot_map <- renderLeaflet({
+    data_station_print_map()
+  })
+  
   
 }
 

@@ -270,7 +270,7 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                                                          "Average dew point temperature at 2 metres above ground level. Values given in Celsius degrees" = "TdAvgC"),
                                                           selected = "Average air temperature at 2 metres above ground level. Values given in Celsius degrees"),
                                               
-                                              actionButton("submitbutton", "Показать"),
+                                              actionButton("submitbutton_daily", "Показать"),
                                               br(),
                                               
                                               HTML("<h3>Скачать файл с данными</h3>"),
@@ -349,7 +349,7 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                               #            choices = list("January" = "01", "February" = "02", "March" = "03", "April" = "04", "May" = "05", "June" = "06", "July" = "07", "August" = "08", "September" = "09", "October" = "10", "November" = "11", "December" = "12")),
                                               #selectInput("month_to", label = "По (включая)",
                                               #            choices = list("February" = "02", "March" = "03", "April" = "04", "May" = "05", "June" = "06", "July" = "07", "August" = "08", "September" = "09", "October" = "10", "November" = "11", "December" = "12"))
-                                              actionButton("submitbutton", "Показать"),
+                                              actionButton("submitbutton_monthly", "Показать"),
                                               br(),
                                               
                                               HTML("<h3>Скачать файл с данными</h3>"),
@@ -372,11 +372,11 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                               h3("Долгота"),
                                               textInput("from", label = h5("От"), value = "30"),
                                               textInput("to", label = h5("До"), value = "85"),
-                                              actionButton("submitbutton", "Показать"),
+                                              actionButton("submitbutton_station", "Показать"),
                                               br(),
                                               mainPanel(
                                                 tags$label(h3('Данные')),
-                                                plotlyOutput("printplot_map") %>% withSpinner(color="#6fc50d"),
+                                                leafletOutput("printplot_map") %>% withSpinner(color="#6fc50d"),
                                                 tags$hr(),
                                                 tableOutput("printtable_station") %>% withSpinner(color="#6fc50d")
                                               ))
@@ -612,10 +612,7 @@ server <- function(input, output, session) {
       , file)}
   )
   
-  # Data Table Station
-  output$printtable_station <- renderTable({
-    input$submitbutton
-    
+  data_station_print <- eventReactive(input$submitbutton_station,{
     daf_station <- data.frame(
       Name = c("from",
                "to"),
@@ -628,20 +625,36 @@ server <- function(input, output, session) {
                             date = Sys.Date(),
                             point = c(input$from, input$to),
                             no_of_stations = 300)
-    
   })
   
-  # Plot station
-  output$printplot_map <- renderPlotly({
-    
-    my_df = nearest_stations_ogimet(country = "Russia",
-                                    date = Sys.Date(),
-                                    point = c(input$from, input$to),
-                                    no_of_stations = 300)
-    
-    qmplot(lon, lat, data = my_df, colour = I('red'), size = I(2), darken = .3)
-    
+  # Data Table Station
+  output$printtable_station <- renderTable({
+    data_station_print()
   })
+  
+  data_station_print_map <- eventReactive(input$submitbutton_station,{
+    daf_station <- data.frame(
+      Name = c("from",
+               "to"),
+      Value = as.character(c(input$from,
+                             input$to)),
+      stringsAsFactors = FALSE)
+    
+    
+    k <- leaflet::leaflet(nearest_stations_ogimet(country = "Russia",
+                                                  date = Sys.Date(),
+                                                  point = c(input$from, input$to),
+                                                  no_of_stations = 300)) %>% 
+      addTiles() %>%
+      addMarkers(~lon, ~lat, popup = ~as.character(station_names), label = ~as.character(station_names))
+    k 
+  })
+  
+  output$printplot_map <- renderLeaflet({
+    data_station_print_map()
+  })
+  
+  
   
 }
 
