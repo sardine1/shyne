@@ -132,53 +132,6 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                                            selectInput("region_seek_hourly", "Регионы", choices = unique(y$region)),
                                                            selectInput("station_seek_hourly", "Станции", choices = NULL),
                                               ),
-                                              selectInput("station_hourly", label = "Станция:", 
-                                                          #станции
-                                                          choices = list("Belogorka" = "26069", "Nikolaevskoe" = "26167", "Volosovo" = "26067", "Lomonosov" = "26060",
-                                                                         "St.petersburg (Voejkovo)" = "26063", "Dno" = "26268",
-                                                                         "Ljuban" = "26078", "Novgorod" = "26179", "Petrokrepost" = "26072", "Kingisepp" = "26059",
-                                                                         "Staraja Russa" = "26275", "Pskov" = "26258", "Kirishi" = "26080", "Vyborg" = "22892",
-                                                                         "Gdov" = "26157", "Holm" = "26378", "Puskinskie Gory" = "26359", "Valaam" = "22805",
-                                                                         "Novaja Ladoga" = "22917", "Opochka" = "26456", "Krestcy" = "26285", "Velikie Luki" = "26477",
-                                                                         "Sortavala" = "22802", "Demjansk" = "26381", "Toropets" = "26479", "Olonec" = "22912",
-                                                                         "Velizh" = "26578", "Tihvin" = "26094", "Ostaskov" = "26389", "Suoyarvi" = "22717",
-                                                                         "Lodejnoe Pole" = "22913", "Borovici" = "26291", "Bologoe" = "26298", "Belyj" = "26585",
-                                                                         "Smolensk" = "26781", "Efimovskaja" = "26099", "Vysnij Volocek" = "26393", "Reboly" = "22602",
-                                                                         "Vinnicy" = "22925", "Petrozavodsk" = "22820", "Pochinok" = "26784", "Kondopoga" = "22727",
-                                                                         "Padany" = "22619", "Staritsa" = "26499", "Ohony" = "27108", "Roslavl" = "26882",
-                                                                         "Vjaz'Ma" = "26695", "Medvezegorsk" = "22721", "Babaevo" = "27008", "Maksatikha" = "27208",
-                                                                         "Spas-Demensk" = "26795", "Gagarin" = "27507", "Krasnaja Gora" = "26976", "Tver" = "27402",
-                                                                         "Kalevala" = "22408", "Segeza" = "22621", "Ustyuzhna" = "27106", "Zukovka" = "26894",
-                                                                         "Vytegra" = "22837", "Pudoz" = "22831", "Krasnyy Kholm" = "27215", "Brjansk" = "26898",
-                                                                         "Klin" = "27417", "Suhinici" = "27707", "Raznavolok" = "22525", "Trubcevsk" = "26997",
-                                                                         "Novo-Jerusalim" = "27511", "Dubna (Ctbt)" = "27415", "Malojaroslavec" = "27606", "Naro-Fominsk" = "27611",
-                                                                         "Port" = "22520", "Kasin" = "27316", "Engozero" = "22413", "Belozersk" = "22939",
-                                                                         "Kolezma" = "22529", "Cerepovec" = "27113", "Moskva (Dolgoprudnyj)" = "27612", "Kovda" = "22312",
-                                                                         "Kreml" = "22429", "Uglic" = "27321", "Kandalaksa" = "22217", "Orel" = "27906",
-                                                                         "Mcensk" = "27817", "Rybinsk" = "27225", "Umba" = "22324", "Tula" = "27719", "Poshehon'e" = "27223",
-                                                                         "Kasira" = "27627", "Apatity" = "22213", "Ponyri" = "34003", "Zizgin" = "22438",
-                                                                         "Pavlovskij Posad" = "27523", "Kargopol" = "22845", "Chernyahovsk" = "26711", "Monchegorsk" = "22212",
-                                                                         "Onega" = "22641", "Kashkarantsy" = "22334", "Kursk" = "34009", "Uzlovaja" = "27821", "Rostov" = "27329",
-                                                                         "Padun" = "22106", "Konevo" = "22749", "Vologda" = "27037", "Efremov" = "27921",
-                                                                         "Gotnja" = "34202", "Obojan" = "34109", "Yaniskoski" = "22101", "Livny" = "34013",
-                                                                         "Turcasovo" = "22648", "Unskij Majak" = "22541", "Vozega" = "22954", "Lovozero" = "22127",
-                                                                         "Nikel" = "22004", "Murmansk" = "22113", "Konosha" = "22951", "Njandoma" = "22854",
-                                                                         "Pavelec" = "27823", "Elec" = "27928", "Rjazan" = "27730", "Bogoroditskoe-Fenino" = "34110",
-                                                                         "Vladimir" = "27532", "Kostroma" = "27333", "Krasnoscel'E" = "22235", "Vajda-Guba" = "22003",
-                                                                         "Ivanovo" = "27347", "Gus'- Hrustal'Nyj" = "27539", "Severodvinsk" = "22546", "Teriberka" = "22028",
-                                                                         "Lipeck" = "27930", "Rjazsk" = "27835", "Buj" = "27242", "Zimnegorskij Majak" = "22446",
-                                                                         "Voronez" = "34123", "Mud'Jug" = "22551", "Pjalica" = "22349", "Valujki" = "34321", "Arhangel'Sk" = "22550",
-                                                                         "Micurinsk" = "27935", "Vel'Sk" = "22867", "Liski" = "34231", "Elat'Ma" = "27648",
-                                                                         "Emeck" = "22656", "Kanevka" = "22249", "Vyksa" = "27643", "Holmogory" = "22559", "Tot'ma" = "27051", "Sasovo" = "27745", "Anna" = "34238",
-                                                                         "Tambov" = "27947", "Morsansk" = "27848", "Jur'Evec" = "27355",
-                                                                         "Senkursk" = "22768", "Kamennaja Step" = "34139", "Dvinskij Bereznik" = "22762", "Nikolo-Poloma" = "27252",
-                                                                         "Kepino" = "22456", "Shangaly" = "22869", "Zerdevka" = "34047", "Volzskaja Gmo" = "27453",
-                                                                         "Zametcino" = "27857", "Bogucar" = "34336", "Temnikov" = "27752", "Kalac" = "34247",
-                                                                         "Kirsanov" = "27957", "Arzamas" = "27653", "Niznij Novgorod" = "27459", "Vologda" = "27037",
-                                                                         "Poshehon'e" = "27223", "Vozega" = "22954", "Kostroma" = "27333", "Rybinsk" = "27225",
-                                                                         "Buj" = "27242", "Rostov" = "27329", "Konosha" = "22951", "Cerepovec" = "27113", "Ivanovo" = "27347", "Uglic" = "27321",
-                                                                         "Belozersk" = "22939", "Njandoma" = "22854", "Kargopol" = "22845", "Vladimir" = "27532"), 
-                                                          selected = "Novgorod"),
                                               #h6("Формат даты : yyyy-mm-dd."), 
                                               h6("При вводе даты с клавиатуры разделитель может быть любой, например, пробел, по окончании необходимо нажать enter."),
                                               dateInput("date_hourly_start", "Начальная дата:", min = "2013-01-01", value = "2022-01-01", startview = 'year', format = "yyyy-mm-dd"),
@@ -463,10 +416,7 @@ server <- function(input, output, session) {
   })
   
   # Data Table Hourly
-  output$printtable <- renderTable({  
-    
-    input$submitbutton
-    
+  data_hourly_print <- eventReactive(input$submitbutton,{
     daf_hourly <- data.frame(
       Name = c("station_seek_hourly",
                "date_hourly_start",
@@ -487,7 +437,10 @@ server <- function(input, output, session) {
     data <- data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
     
     data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
-    
+  })
+  
+  output$printtable <- renderTable({
+    data_hourly_print()
   })
   
   # Download data hourly

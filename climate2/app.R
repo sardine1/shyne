@@ -475,11 +475,7 @@ server <- function(input, output, session) {
     
   })
   
-  # Data Table Hourly
-  output$printtable <- renderTable({  
-    
-    input$submitbutton
-    
+  data_hourly_print <- eventReactive(input$submitbutton,{
     daf_hourly <- data.frame(
       Name = c("station_seek_hourly",
                "date_hourly_start",
@@ -500,8 +496,12 @@ server <- function(input, output, session) {
     data <- data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
     
     data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
-    
   })
+  
+  output$printtable <- renderTable({
+    data_hourly_print()
+  })
+  
   
   # Download data hourly
   output$download <- downloadHandler(
