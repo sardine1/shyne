@@ -12,7 +12,6 @@ library(ggmap)
 library(shinycssloaders)
 library(rio)
 library(echarts4r)
-library(recharts)
 
 y <- import("https://raw.githubusercontent.com/sardine1/shiny/main/climate/stations.csv")
 
@@ -444,16 +443,12 @@ server <- function(input, output, session) {
     time_start = input$date_daily_start
     time_end = input$date_daily_end
     
-    time1_end = as.POSIXct("2012-01-01")
+    time1_end = num_station_daily[4]
     
-    if (time_end == time1_end){
-      print("Equal times")
-    }else{
-      
-      if(time1< time2){
-        print ("Time1 smaller")
-      }else{
-        print ("Time2 smaller")
+    if (time_start < time1_end){
+      time_start = time1_end
+      if(time_end< time1_end){
+        time_end = "2015-12-31"
       }
     }
     
