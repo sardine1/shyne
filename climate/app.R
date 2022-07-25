@@ -175,7 +175,7 @@ ui <- fluidPage(theme = shinytheme("readable"),
                                                                          "Average dew point temperature at 2 metres above ground level. Values given in Celsius degrees" = "TdAvgC"),
                                                           selected = "Average air temperature at 2 metres above ground level. Values given in Celsius degrees"),
                                               
-                                              actionButton("submitbutton", "Показать"),
+                                              actionButton("submitbutton_daily", "Показать"),
                                               br(),
                                               
                                               HTML("<h3>Скачать файл с данными</h3>"),
@@ -372,6 +372,26 @@ server <- function(input, output, session) {
     
   })
   
+  # Data Table Daily
+  data_daily_print <- eventReactive(input$submitbutton_daily,{
+    
+    num_station_daily <- subset(y, station == input$station_seek_daily)
+    
+    df = meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = as.numeric(num_station_daily[3]))
+    
+    df1 = df[2]
+    
+    data <- data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
+    
+    data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
+    
+  })
+  
+  # Data Table Daily on click button
+  output$printtable_daily <- renderTable({
+    data_daily_print()
+  })
+  
   # Data Table Hourly
   data_hourly_print <- eventReactive(input$submitbutton,{
     daf_hourly <- data.frame(
@@ -396,6 +416,7 @@ server <- function(input, output, session) {
     data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
   })
   
+  # Data Table Hourly on click button
   output$printtable <- renderTable({
     data_hourly_print()
   })
@@ -409,23 +430,6 @@ server <- function(input, output, session) {
     content = function(file) {write.csv(meteo_ogimet(interval = "hourly", date = c(input$date_hourly_start, input$date_hourly_end), station = as.numeric(subset(y, station == input$station_seek_hourly)[3])), file)}
     
   )
-  
-  # Data Table Daily
-  output$printtable_daily <- renderTable({  
-    
-    input$submitbutton
-    
-    num_station_daily <- subset(y, station == input$station_seek_daily)
-    
-    df = meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = as.numeric(num_station_daily[3]))
-    
-    df1 = df[2]
-    
-    data <- data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
-    
-    data.frame(format(df1, format = "%d %m %Y"), df[3:9], df[11], df[13:17])
-    
-  })
   
   # Download data daily
   output$download_daily <- downloadHandler(
@@ -470,6 +474,8 @@ server <- function(input, output, session) {
     fig1
     
   })
+  
+  
   
   # Data Table Monthly
   output$printtable_monthly <- renderTable({
@@ -525,7 +531,7 @@ server <- function(input, output, session) {
                             no_of_stations = 600)
   })
   
-  # Data Table Station
+  # Data Table Station on click button
   output$printtable_station <- renderTable({
     data_station_print()
   })
@@ -549,7 +555,7 @@ server <- function(input, output, session) {
     k 
   })
   
-  #Stations on a map
+  #Stations on a map on click button
   output$printplot_map <- renderLeaflet({
     data_station_print_map()
   })
