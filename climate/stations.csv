@@ -8,6 +8,7 @@ Bryansk Oblast;Krasnaja Gora;26976;01.01.2015
 Republic of Bashkortostan;Askino;28522;01.01.2015
 Vologda Oblast;Tot'ma;27051;01.01.2015
 Voronezh Oblast;Anna;34238;01.01.2015
+Volgograd Oblast;Kalac;34247;01.01.2015
 Vladimir Oblast;Aksakovo;28719;01.01.2015
 Ivanovo Oblast;Jur'Evec;27355;01.01.2015
 Kaluga Oblast;Suhinici;27707;01.01.2015
@@ -19,10 +20,12 @@ Kostroma Oblast;Kostroma;27333;01.01.2015
 Kurgan Oblast;Sadrinsk;28552;01.01.2015
 Republic of Karelia;Sortavala;22802;01.01.2015
 Leningrad Oblast;Volosovo;26067;01.01.2015
+Lipetsk Oblast;Elec;27928;01.01.2015
 Mari El Republic;Koz'Modem'Jansk;27479;01.01.2015
 Murmansk Oblast;Kandalaksa;22217;01.01.2015
 Nizhny Novgorod Oblast;Volzskaja Gmo;27453;01.01.2015
 Novgorod Oblast;Novgorod;26179;01.01.2015
+Novosibirsk Oblast;Jarkovo;28366;01.01.2015
 Nenets Autonomous Okrug;Nizhnyaya Pesha;22383;01.01.2015
 Oryol Oblast;Orel;27906;01.01.2015
 Omsk Oblast;Omsk;28698;01.01.2015
@@ -141,7 +144,6 @@ Murmansk Oblast;Murmansk;22113;01.01.2015
 Arkhangelsk Oblast;Konosha;22951;01.01.2015
 Arkhangelsk Oblast;Njandoma;22854;01.01.2015
 Ryazan Oblast;Pavelec;27823;01.01.2015
-Lipetsk Oblast;Elec;27928;01.01.2015
 Tula Oblast;Krasnoscel'E;22235;01.01.2015
 Murmansk Oblast;Vajda-Guba;22003;01.01.2015
 Ivanovo Oblast;Ivanovo;27347;01.01.2015
@@ -175,7 +177,6 @@ Arkhangelsk Oblast;Shangaly;22869;01.01.2015
 Tambov Oblast;Zerdevka;34047;01.01.2015
 Voronezh Oblast;Bogucar;34336;01.01.2015
 Republic of Mordovia;Temnikov;27752;01.01.2015
-Volgograd Oblast;Kalac;34247;01.01.2015
 Novgorod Oblast;Arzamas;27653;01.01.2015
 Nizhny Novgorod Oblast;Niznij Novgorod;27459;01.01.2015
 Yaroslavl Oblast;Poshehon'e;27223;01.01.2015
@@ -266,7 +267,6 @@ Republic of Bashkortostan;Birsk;28621;01.01.2015
 Udmurt Republic;Izhevsk;28411;01.01.2015
 Tyumen Oblast;Jalturovosk;28465;01.01.2015
 Arkhangelsk Oblast;Malye Karmakuly;20744;01.01.2015
-Novosibirsk Oblast;Jarkovo;28366;01.01.2015
 Udmurt Republic;Glazov;28214;01.01.2015
 Khanty-Mansi Autonomous Okrug;Hanty-Mansijsk;23933;01.01.2015
 Chelyabinsk Oblast;Chelyabinsk-Gorod;28645;01.01.2015
