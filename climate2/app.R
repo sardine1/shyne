@@ -447,12 +447,14 @@ server <- function(input, output, session) {
     
     if (time_start < time1_end){
       time_start = time1_end
-      if(time_end< time1_end){
+      if(time_end < time1_end){
         time_end = "2015-12-31"
       }
+    }else if (time_end < time1_end){
+      time_end = time1_end
     }
     
-    df = meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = as.numeric(num_station_daily[3]))
+    df = meteo_ogimet(interval = "daily", date = c(input$time_start, input$time_end), station = as.numeric(num_station_daily[3]))
     data1 = data.frame(df[names(df) == input$param_daily], df[2])
     if (input$param_daily == "TemperatureCAvg") {
       fig1 = plot_ly(data1, x = ~ Date, y = ~ TemperatureCAvg) %>% 
@@ -520,7 +522,23 @@ server <- function(input, output, session) {
     
     num_station_daily <- subset(y, station == input$station_seek_daily)
     
-    df = meteo_ogimet(interval = "daily", date = c(input$date_daily_start, input$date_daily_end), station = as.numeric(num_station_daily[3]))
+    time_start = input$date_daily_start
+    time_end = input$date_daily_end
+    
+    time1_end = num_station_daily[4]
+    
+    if (time_start < time1_end){
+      time_start = time1_end
+      if(time_end < time1_end){
+        time_end = "2015-12-31"
+      }
+    } else if (time_end < time1_end){
+      time_end = time1_end
+    }
+    
+    num_station_daily <- subset(y, station == input$station_seek_daily)
+    
+    df = meteo_ogimet(interval = "daily", date = c(time_start, time_end), station = as.numeric(num_station_daily[3]))
     
     df1 = df[2]
     
